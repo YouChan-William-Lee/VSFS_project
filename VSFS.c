@@ -109,6 +109,13 @@ void list(char* FS){
     mode_t file_mode; // for type and permission of file
     struct tm* created_time; // for the time file created
     char* file_path_and_name;
+    int total_size = 0;
+
+    /* Set the directory */
+    if (FS[strlen(FS)-1] == '/') {
+        int size = strlen(FS);
+        FS[size-1] = '\0';
+    }
 
     /* Set the directory */
     directory = opendir(FS);
@@ -116,13 +123,28 @@ void list(char* FS){
         perror("Error ");
         exit(1);
     }
-    else {
-        if (FS[strlen(FS)-1] == '/') {
-            int size = strlen(FS);
-            FS[size-1] = '\0';
+
+    /* Check the total size of directory */
+    while (directory_entry = readdir(directory)) {
+        if (stat(directory_entry -> d_name, &file_info) == -1) {
+            printf("%s\n", directory_entry -> d_name);
+
+            perror("Error ");
+            exit(1);  
+        }
+        if (!(directory_entry -> d_name[0] == '.')) {
+            total_size += file_info.st_size;
         }
     }
-    
+
+    /* Print directory */
+    printf("%s:\n", FS);
+
+    /* Print total size */
+    printf("total %d\n", total_size/1000);
+
+    directory = opendir(FS);
+
     /* Read files one by one */
     while (directory_entry = readdir(directory)) {
         if (stat(directory_entry -> d_name, &file_info) == -1) {
@@ -134,6 +156,7 @@ void list(char* FS){
         /* Check whether it is hidden file */
         if (!(directory_entry -> d_name[0] == '.')) {
             file_mode = file_info.st_mode;
+
             /* Print attribute */
             attribute(file_mode);
 
