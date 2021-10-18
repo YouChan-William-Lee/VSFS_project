@@ -15,12 +15,13 @@ NOTES V1.0
 @dir1/dir3/note1
  Although this is also note1, it is not in the root dir as the first was.
  Dir2 above is an empty dir
- 12
+ EFBCS
 =dir1/dir3/dir4
 =dir1/dir3/dir5
 =dir1/dir3/dir6
 @dir1/note2
  Although this is also note1, it is not in the root dir as the first was.
  Dir2 above is an empty dir
+ 19375
 #deletednote
 #these lines are ignored when reading in VSFS

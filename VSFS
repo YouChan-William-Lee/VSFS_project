@@ -125,44 +125,82 @@ def check_subdir(FS):
     return sorted(dirs)
 
 # Check internal file
-def check_IF(FS, IF):
-    valid = False
+def check_IF(COMMAND, FS, IF):
     file = open(FS, 'r')
     lines = file.readlines()
-    for line in lines:
-        # Remove '/' if it exists at the end
-        if(line[-2] == "/"):
-            line = line[0:-2]
-        else:
-            line = line[0:-1]
+    valid = False
+    if (COMMAND == "copyin"):
+        for line in lines:
+            # Remove '/' if it exists at the end
+            if(line[-2] == "/"):
+                line = line[0:-2]
+            else:
+                line = line[0:-1]
 
-        # Check if it is current directory
-        if (IF.count("/") == 0):
-            # Check if IF already exists
+            # Check if it is current directory
+            if (IF.count("/") == 0):
+                # Check if IF already exists
+                if (line[0] == "@"):
+                    if(line[1:] == IF):
+                        valid = False
+                        break
+                else:
+                    valid = True
+            else:
+                # Check if IF already exists
+                if (line[0] == "@"):
+                    if(line[1:] == IF):
+                        valid = False
+                        break
+                # Check if IF path is valid    
+                elif (line[0] == "="):
+                    if (line[1:] == IF[0:IF.rindex("/")]):
+                        valid = True
+    elif (COMMAND == "copyout"):
+        for line in lines:
             if (line[0] == "@"):
                 if(line[1:-1] == IF):
-                    valid = False
-                    break
-        else:
-            # Check if IF already exists
-            if (line[0] == "@"):
-                if(line[1:] == IF):
-                    valid = False
-                    break
-            # Check if IF path is valid    
-            elif (line[0] == "="):
-                if (line[1:] == IF[0:IF.rindex("/")]):
                     valid = True
-
+                    break
     file.close()
     return valid
 
 # Check file system
 def check_FS(FS):
     valid = False
-    file = open(FS, 'r')
-    if (file.readline() == "NOTES V1.0\n"):
-        valid = True
+    
+    if(FS.count("/") == 0):
+        valid = os.path.isfile("./" + FS)
+        if (valid == True):
+            file = open("./" + FS, 'r')
+            if (file.readline() == "NOTES V1.0\n"):
+                valid = True
+            else:
+                valid = False
+            file.close()
+    else:
+        valid = os.path.isfile(FS)
+        file = open(FS, 'r')
+        if (valid == True):
+            file = open("./" + FS, 'r')
+            if (file.readline() == "NOTES V1.0\n"):
+                valid = valid = True
+            else:
+                valid = False
+            file.close()
+    return valid
+
+# Check external file 
+def check_EF(COMMAND, EF):
+    valid = False
+    if (EF.count("/") == 0 and COMMAND == "copyin"):
+        valid = os.path.isfile("./" + EF)
+    elif (EF.count("/") == 0 and COMMAND == "copyout"):
+        valid = not os.path.isfile("./" + EF)
+    elif (EF.count("/") != 0 and COMMAND == "copyin"):
+        valid = os.path.isfile(EF) 
+    elif (EF.count("/") != 0 and COMMAND == "copyout"):
+        valid = not os.path.isfile(EF)   
     return valid
 
 # Copy the external file, EF, into the FS as internal file named IF
@@ -183,6 +221,39 @@ def copyin(FS, EF, IF):
     # Copy the content of EF into the IF
     for line in EF_lines:
         IF_file.write(" " + line)    
+    
+    EF_file.close()
+    IF_file.close()
+
+# Copy the internal file IF within FS to external file EF
+def copyout(FS, IF, EF):
+    
+    IF_file = open(FS, 'r')
+
+    if (EF.count("/") == 0):
+        EF_file = open("./" + EF, 'w')
+        IF_lines = IF_file.readlines()
+        for index, line in enumerate(IF_lines):
+            file_index = index
+            if(line[1:-1] == IF):
+                while(True):
+                    if (IF_lines[file_index + 1][0].isspace()):
+                        EF_file.write(IF_lines[file_index + 1][1:])
+                        file_index += 1
+                    else:
+                        break
+    else:
+        EF_file = open(EF, 'w')
+        IF_lines = IF_file.readlines()
+        for index, line in enumerate(IF_lines):
+            file_index = index
+            if(line[1:-1] == IF):
+                while(True):
+                    if (IF_lines[file_index + 1][0].isspace()):
+                        EF_file.write(IF_lines[file_index + 1][1:])
+                        file_index += 1
+                    else:
+                        break
 
 # Define variables
 MIN_NUM_COMMAND = 3
@@ -194,7 +265,7 @@ if (len(sys.argv) < MIN_NUM_COMMAND or len(sys.argv) > MAX_NUM_COMMAND):
 # VSFS list FS    
 elif (sys.argv[1] == "list" and len(sys.argv) == 3):
     # Check if FS exists
-    if(os.path.isfile(sys.argv[2]) and check_FS(sys.argv[2])):
+    if(check_FS(sys.argv[2])):
         dirs = check_subdir(sys.argv[2])
         for dir in dirs:
             list(sys.argv[2], dir)
@@ -202,14 +273,26 @@ elif (sys.argv[1] == "list" and len(sys.argv) == 3):
         invalid_VSFS()
 # VSFS copyin FS EF IF        
 elif (sys.argv[1] == "copyin" and len(sys.argv) == 5):
-    if (os.path.isfile(sys.argv[2]) and check_FS(sys.argv[2]) and os.path.isfile(sys.argv[3])):
+    if (check_FS(sys.argv[2]) and check_EF(sys.argv[1], sys.argv[3])):
         if (sys.argv[4][0] != "/" and sys.argv[4][-1] != "/"):
-            if (check_IF(sys.argv[2], sys.argv[4])):
+            if (check_IF(sys.argv[1], sys.argv[2], sys.argv[4])):
                 copyin(sys.argv[2], sys.argv[3], sys.argv[4])
             else:
                 invalid_VSFS()    
         else:
             invalid_VSFS()        
+    else:
+        invalid_VSFS()
+# VSFS copyout FS IF EF
+elif (sys.argv[1] == "copyout" and len(sys.argv) == 5):
+    if (check_FS(sys.argv[2]) and check_EF(sys.argv[1], sys.argv[4])):
+        if (sys.argv[4][0] != "/" and sys.argv[4][-1] != "/"):
+            if (check_IF(sys.argv[1], sys.argv[2], sys.argv[3])):
+                copyout(sys.argv[2], sys.argv[3], sys.argv[4])
+            else:
+                invalid_VSFS()
+        else: 
+            invalid_VSFS()
     else:
         invalid_VSFS()
 else:
