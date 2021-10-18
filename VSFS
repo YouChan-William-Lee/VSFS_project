@@ -26,43 +26,40 @@ def list(FS, dir):
 
     file = open(FS, 'r')
     lines = file.readlines()
-    if (lines[0] == "NOTES V1.0\n"):
-        if (dir == "current"):
-            print(".:")
-            print("total", total_size)
-            for index, line in enumerate(lines):
-                if (line[0] == "@" and line.count("/") == 0):
-                    # Check the size how many lines in the file
-                    file_size = 0
-                    file_index = index
-                    while(True):
-                        if (lines[file_index + 1][0].isspace()):
-                            file_size += 1
-                            file_index += 1
-                        else:
-                            break
-                    print("-" + attribute, "%3s"%1, owner, group, file_size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
-                elif (line[0] == "=" and line.count("/") == 1 and line.find("/") + 1 == line.find("\n")):
-                    print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:len(line) - 2]), owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:len(line) - 2])
-        else:
-            print("./" + dir + ":")
-            print("total", total_size)
-            for index, line in enumerate(lines):
-                if (line[0] == "@" and line.count("/") == dir.count("/") + 1 and line.find(dir) == 1):
-                    # Check the size how many lines in the file
-                    file_size = 0
-                    file_index = index
-                    while(True):
-                        if (lines[file_index + 1][0].isspace()):
-                            file_size += 1
-                            file_index += 1
-                        else:
-                            break
-                    print("-" + attribute, "%3s"%1, owner, group, file_size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
-                elif (line[0] == "=" and line.count("/") == dir.count("/") + 1 and line.find(dir) == 1 and line.find("/") + 1 != line.find("\n")):
-                    print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:len(line) - 1]), owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:len(line) - 1])
-    else :
-        print("Invalid FS")
+    if (dir == "current"):
+        print(".:")
+        print("total", total_size)
+        for index, line in enumerate(lines):
+            if (line[0] == "@" and line.count("/") == 0):
+                # Check the size how many lines in the file
+                file_size = 0
+                file_index = index
+                while(True):
+                    if (lines[file_index + 1][0].isspace()):
+                        file_size += 1
+                        file_index += 1
+                    else:
+                        break
+                print("-" + attribute, "%3s"%1, owner, group, file_size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
+            elif (line[0] == "=" and line.count("/") == 1 and line.find("/") + 1 == line.find("\n")):
+                print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:-2])
+    else:
+        print("./" + dir + ":")
+        print("total", total_size)
+        for index, line in enumerate(lines):
+            if (line[0] == "@" and line.count("/") == dir.count("/") + 1 and line.find(dir) == 1):
+                # Check the size how many lines in the file
+                file_size = 0
+                file_index = index
+                while(True):
+                    if (lines[file_index + 1][0].isspace()):
+                        file_size += 1
+                        file_index += 1
+                    else:
+                        break
+                print("-" + attribute, "%3s"%1, owner, group, file_size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
+            elif (line[0] == "=" and line.count("/") == dir.count("/") + 1 and line.find(dir) == 1 and line.find("/") + 1 != line.find("\n")):
+                print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:-1]), owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:-1])
 
     print("")
     file.close()
@@ -102,11 +99,10 @@ def check_number_of_subdir(FS, dir):
     total_number_of_subdir = 0
     file = open(FS, 'r')
     lines = file.readlines()
-    if (lines[0] == "NOTES V1.0\n"):
-        for line in lines:
-            if (line[0] == "="):
-                if (line.count("/") == dir.count("/") + 1 and line.find(dir) == 1 and line.rindex("/") + 1 != line.rindex("\n")):
-                    total_number_of_subdir += 1
+    for line in lines:
+        if (line[0] == "="):
+            if (line.count("/") == dir.count("/") + 1 and line.find(dir) == 1 and line.rindex("/") + 1 != line.rindex("\n")):
+                total_number_of_subdir += 1
 
     file.close()
     return total_number_of_subdir
@@ -116,26 +112,105 @@ def check_subdir(FS):
     dirs = ['current']
     file = open(FS, 'r')
     lines = file.readlines()
-    if (lines[0] == "NOTES V1.0\n"):
-        for line in lines:
-            if (line[0] == "="):
-                # Check number of directory when 1
-                if (line.count("/") == 1 and line.rindex("/") + 1 == line.rindex("\n")):
-                    dirs.append(line[1:len(line) - 2])
-                # Check number of directory when more than 2    
-                elif (line.count("/") >= 1 and line.rindex("/") + 1 != line.rindex("\n")):
-                    dirs.append(line[1:len(line) - 1])
+    for line in lines:
+        if (line[0] == "="):
+            # Check number of directory when 1
+            if (line.count("/") == 1 and line.rindex("/") + 1 == line.rindex("\n")):
+                dirs.append(line[1:-2])
+            # Check number of directory when more than 2    
+            elif (line.count("/") >= 1 and line.rindex("/") + 1 != line.rindex("\n")):
+                dirs.append(line[1:-1])
 
     file.close()
     return sorted(dirs)
 
+# Check internal file
+def check_IF(FS, IF):
+    valid = False
+    file = open(FS, 'r')
+    lines = file.readlines()
+    for line in lines:
+        # Remove '/' if it exists at the end
+        if(line[-2] == "/"):
+            line = line[0:-2]
+        else:
+            line = line[0:-1]
+
+        # Check if it is current directory
+        if (IF.count("/") == 0):
+            # Check if IF already exists
+            if (line[0] == "@"):
+                if(line[1:-1] == IF):
+                    valid = False
+                    break
+        else:
+            # Check if IF already exists
+            if (line[0] == "@"):
+                if(line[1:] == IF):
+                    valid = False
+                    break
+            # Check if IF path is valid    
+            elif (line[0] == "="):
+                if (line[1:] == IF[0:IF.rindex("/")]):
+                    valid = True
+
+    file.close()
+    return valid
+
+# Check file system
+def check_FS(FS):
+    valid = False
+    file = open(FS, 'r')
+    if (file.readline() == "NOTES V1.0\n"):
+        valid = True
+    return valid
+
+# Copy the external file, EF, into the FS as internal file named IF
+def copyin(FS, EF, IF):
+    EF_file = open(EF, 'r')
+    IF_file = open(FS, 'a+')
+
+    # Move cursor to the start to check last location of cursor is starting at the end of new line
+    IF_file.seek(0)
+    IF_lines = IF_file.readlines()
+    if(IF_lines[-1][-1].isspace() is False):
+        IF_file.write("\n")
+
+    #Write @IF
+    IF_file.write("@" + IF + "\n")
+    EF_lines = EF_file.readlines()
+    
+    # Copy the content of EF into the IF
+    for line in EF_lines:
+        IF_file.write(" " + line)    
+
+# Define variables
+MIN_NUM_COMMAND = 3
+MAX_NUM_COMMAND = 5
+
 # Start VSFS program here
-if (len(sys.argv) <= 2 or len(sys.argv) > 4):
+if (len(sys.argv) < MIN_NUM_COMMAND or len(sys.argv) > MAX_NUM_COMMAND):
     invalid_VSFS()
-elif (sys.argv[1] == "list"):
-    if(os.path.isfile(sys.argv[2])):
+# VSFS list FS    
+elif (sys.argv[1] == "list" and len(sys.argv) == 3):
+    # Check if FS exists
+    if(os.path.isfile(sys.argv[2]) and check_FS(sys.argv[2])):
         dirs = check_subdir(sys.argv[2])
         for dir in dirs:
             list(sys.argv[2], dir)
     else:
         invalid_VSFS()
+# VSFS copyin FS EF IF        
+elif (sys.argv[1] == "copyin" and len(sys.argv) == 5):
+    if (os.path.isfile(sys.argv[2]) and check_FS(sys.argv[2]) and os.path.isfile(sys.argv[3])):
+        if (sys.argv[4][0] != "/" and sys.argv[4][-1] != "/"):
+            if (check_IF(sys.argv[2], sys.argv[4])):
+                copyin(sys.argv[2], sys.argv[3], sys.argv[4])
+            else:
+                invalid_VSFS()    
+        else:
+            invalid_VSFS()        
+    else:
+        invalid_VSFS()
+else:
+    invalid_VSFS()
