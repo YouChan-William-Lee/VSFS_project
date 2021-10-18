@@ -15,40 +15,89 @@ def list(FS, dir):
     number_of_link = ls_command_result[1]
     owner = ls_command_result[2]
     group = ls_command_result[3]
-    size = ls_command_result[4]
+    # size = ls_command_result[4]
     month = ls_command_result[5]
     day = ls_command_result[6]
     time = ls_command_result[7]
+
+    total_size = check_total_size(FS, dir)
 
     file = open(FS, 'r')
     lines = file.readlines()
     if (lines[0] == "NOTES V1.0\n"):
         if (dir == "current"):
             print(".:")
-            print("total")
-            for line in lines:
+            print("total", total_size)
+            for index, line in enumerate(lines):
                 if (line[0] == "@" and line.count("/") == 0):
-                    print("-" + attribute, "%3s"%number_of_link, owner, group, size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
-                    # print(line[index + 1])
+                    # Check the size how many lines in the file
+                    file_size = 0
+                    file_index = index
+                    while(True):
+                        if (lines[file_index + 1][0] == ' '):
+                            file_size += 1
+                            file_index += 1
+                        else:
+                            break
+                    print("-" + attribute, "%3s"%number_of_link, owner, group, file_size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
                 elif (line[0] == "=" and line.count("/") == 0 and line.fine(dir) == 1):
-                    print("d" + attribute, "%3s"%number_of_link, owner, group, size, month, day, time, os.getcwd() + "/" + line[1:len(line) - 2])
+                    print("d" + attribute, "%3s"%number_of_link, owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:len(line) - 2])
         else:
             print("./" + dir + ":")
-            print("total")
-            for line in lines:
+            print("total", total_size)
+            for index, line in enumerate(lines):
                 if (line[0] == "@" and line.count("/") == dir.count("/") + 1 and line.find(dir) == 1):
-                    print("-" + attribute, "%3s"%number_of_link, owner, group, size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
+                    # Check the size how many lines in the file
+                    file_size = 0
+                    file_index = index
+                    while(True):
+                        if (lines[file_index + 1][0] == ' '):
+                            file_size += 1
+                            file_index += 1
+                        else:
+                            break
+                    print("-" + attribute, "%3s"%number_of_link, owner, group, file_size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
                 elif (line[0] == "=" and line.count("/") == dir.count("/") + 1 and line.find(dir) == 1 and line.find("/") + 1 != line.find("\n")):
-                    print("d" + attribute, "%3s"%number_of_link, owner, group, size, month, day, time, os.getcwd() + "/" + line[1:len(line) - 1])
+                    print("d" + attribute, "%3s"%number_of_link, owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:len(line) - 1])
     else :
         print("Invalid FS")
 
     print("")
     file.close()
 
+def check_total_size(FS, dir):
+    total_size = 0
+    file = open(FS, 'r')
+    lines = file.readlines()
+    if (dir == "current"):
+        for index, line in enumerate(lines):
+            if (line[0] == "@" and line.count("/") == 0):
+                # Check the size how many lines in the file
+                file_index = index
+                while(True):
+                    if (lines[file_index + 1][0] == ' '):
+                        total_size += 1
+                        file_index += 1
+                        print("test", lines[file_index + 1])
+                    else:
+                        break
+    else:
+        for index, line in enumerate(lines):
+                if (line[0] == "@" and line.count("/") == dir.count("/") + 1 and line.find(dir) == 1):
+                    # Check the size how many lines in the file
+                    file_index = index
+                    while(True):
+                        if (lines[file_index + 1][0] == ' '):
+                            total_size += 1
+                            file_index += 1
+                        else:
+                            break
+    file.close()
+    return total_size
+
+
 def check_subdir(FS):
     dirs = ['current']
-    sizes = []
     file = open(FS, 'r')
     lines = file.readlines()
     if (lines[0] == "NOTES V1.0\n"):
@@ -63,8 +112,6 @@ def check_subdir(FS):
 
     file.close()
     return sorted(dirs)
-
-
 
 if (len(sys.argv) <= 2 or len(sys.argv) > 4):
     invalid_VSFS()
