@@ -69,7 +69,6 @@ def list(FS, dir):
 
 # Check the total size of current directory
 def check_total_size(FS, dir):
-    print("@@@@", dir)
     total_size = 0
     file = open(FS, 'r')
     lines = file.readlines()
@@ -100,17 +99,17 @@ def check_total_size(FS, dir):
 
 # Check total number of subdirectories of current directory
 def check_number_of_subdir(FS, dir):
-    total_number = 0
+    total_number_of_subdir = 0
     file = open(FS, 'r')
     lines = file.readlines()
     if (lines[0] == "NOTES V1.0\n"):
         for line in lines:
             if (line[0] == "="):
-                if (line.count("/") == dir.count("/") + 1 and line.rindex("/") + 1 != line.rindex("\n")):
-                    total_number += 1
+                if (line.count("/") == dir.count("/") + 1 and line.find(dir) == 1 and line.rindex("/") + 1 != line.rindex("\n")):
+                    total_number_of_subdir += 1
 
     file.close()
-    return total_number
+    return total_number_of_subdir
 
 # Check total subdirectories recursively 
 def check_subdir(FS):
