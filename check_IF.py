@@ -9,19 +9,15 @@ def check_IF(COMMAND, FS, IF):
         if (COMMAND == "copyin"):
             # If IF is on current directory, it should not exist
             if (IF.count("/") == 0):
-                if (lines.count("@"+ IF + "\n") == 0):
+                if (lines.count("@" + IF + "\n") == 0):
                     valid = True
             else:
                 # IF should not exist but sub directory of IF should exist
-                print(IF[0:IF.rindex("/")])
-                if (lines.count("@"+ IF + "\n") == 0 
-                    and (lines.count("="+ IF[0:IF.rindex("/")] + "\n") == 1 
-                    # Check the directories on current directory which has '/' at the end 
-                    or lines.count("="+ IF[0:IF.rindex("/")] + "/\n") == 1)):
+                if (lines.count("@" + IF + "\n") == 0 and lines.count("=" + IF[0:IF.rindex("/")] + "/\n") == 1):
                     valid = True
         elif (COMMAND == "copyout" or COMMAND == "rm"):
             # IF should exist 
-            if (lines.count("@"+ IF + "\n") == 1):
+            if (lines.count("@" + IF + "\n") == 1):
                 valid = True
     file.close()
 

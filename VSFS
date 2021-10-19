@@ -8,6 +8,7 @@ from copyout import *
 from list import *
 from mkdir import *
 from rm import *
+from rmdir import *
 
 from check_FS import *
 from check_IF import *
@@ -48,7 +49,7 @@ elif (sys.argv[1] == "copyout" and len(sys.argv) == 5):
         invalid_VSFS()
 # VSFS mkdir FS ID   
 elif (sys.argv[1] == "mkdir" and len(sys.argv) == 4):
-    if (check_FS(sys.argv[2]) and check_ID(sys.argv[2], sys.argv[3])):
+    if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
         mkdir(sys.argv[2], sys.argv[3])
     else:
         invalid_VSFS()
@@ -56,6 +57,12 @@ elif (sys.argv[1] == "mkdir" and len(sys.argv) == 4):
 elif (sys.argv[1] == "rm" and len(sys.argv) == 4):
     if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3])):
         rm(sys.argv[2], sys.argv[3])
+    else:
+        invalid_VSFS()
+# VSFS rmdir FS ID   
+elif (sys.argv[1] == "rmdir" and len(sys.argv) == 4):
+    if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
+        rmdir(sys.argv[2], sys.argv[3])
     else:
         invalid_VSFS()
 else:

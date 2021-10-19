@@ -12,6 +12,10 @@ def copyin(FS, EF, IF):
     #Write @IF
     IF_file.write("@" + IF + "\n")
     EF_lines = EF_file.readlines()
+
+    # Check the length of content of EF
+    if (len(EF_lines) > 255):
+        EF_lines = EF_lines[0:255]
     
     # Copy the content of EF into the IF
     for line in EF_lines:

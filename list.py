@@ -56,8 +56,8 @@ def list(FS, dir):
                         break
                 print("-" + attribute, "%3s"%1, owner, group, file_size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
             # Check directories
-            elif (line[0] == "=" and line.count("/") == dir.count("/") + 1 and line.find(dir) == 1 and line.find("/") + 1 != line.find("\n")):
-                print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:-1]), owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:-1])
+            elif (line[0] == "=" and line.count("/") == dir.count("/") + 2 and line.find(dir) == 1 and line.rfind("/") + 1 == line.rfind("\n")):
+                print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:-2])
 
     print("")
     file.close()
@@ -99,7 +99,7 @@ def check_number_of_subdir(FS, dir):
     lines = file.readlines()
     for line in lines:
         if (line[0] == "="):
-            if (line.count("/") == dir.count("/") + 1 and line.find(dir) == 1 and line.rindex("/") + 1 != line.rindex("\n")):
+            if (line.count("/") == dir.count("/") + 2 and line.find(dir) == 1 and line.rindex("/") + 1 == line.rindex("\n")):
                 total_number_of_subdir += 1
 
     file.close()
@@ -113,11 +113,8 @@ def check_subdir(FS):
     for line in lines:
         if (line[0] == "="):
             # Check number of directory on current directory
-            if (line.count("/") == 1 and line.rindex("/") + 1 == line.rindex("\n")):
+            if (line.rindex("/") + 1 == line.rindex("\n")):
                 dirs.append(line[1:-2])
-            # Check number of directory when more than 2    
-            elif (line.count("/") >= 1 and line.rindex("/") + 1 != line.rindex("\n")):
-                dirs.append(line[1:-1])
 
     file.close()
     return sorted(dirs)
