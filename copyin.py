@@ -1,3 +1,5 @@
+import re
+
 # Copy the external file, EF, into the FS as internal file named IF
 def copyin(FS, EF, IF):
     EF_file = open(EF, 'r')
@@ -9,8 +11,15 @@ def copyin(FS, EF, IF):
     if(IF_lines[-1][-1].isspace() is False):
         IF_file.write("\n")
 
-    #Write @IF
+    # Check subdirectories already exist
+    index = [m.start() for m in re.finditer(r"/", IF)]
+    for i in range(len(index)):
+        if (IF_lines.count("=" + IF[0:index[i]] + "/\n") == 0):
+            IF_file.write("=" + IF[0:index[i]] + "/\n")
+        
+    # Write @IF
     IF_file.write("@" + IF + "\n")
+
     EF_lines = EF_file.readlines()
 
     # Check the length of content of EF
