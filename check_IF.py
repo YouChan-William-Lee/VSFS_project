@@ -1,3 +1,5 @@
+from rm import *
+
 # Check internal file
 def check_IF(COMMAND, FS, IF):
     file = open(FS, 'r')
@@ -8,9 +10,9 @@ def check_IF(COMMAND, FS, IF):
     if (IF[0] != "/" and IF[-1] != "/"):
         if (COMMAND == "copyin"):
             valid = True
-            # IF should not exist
+            # IF already exists, then remove the original file
             if (lines.count("@" + IF + "\n") == 1):
-                valid = False
+                rm(FS, IF)
         elif (COMMAND == "copyout" or COMMAND == "rm"):
             # IF should exist 
             if (lines.count("@" + IF + "\n") == 1):

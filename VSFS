@@ -17,7 +17,8 @@ from check_ID import *
 
 # Print 'Invalid VSFS'
 def invalid_VSFS():
-    print("Invalid VSFS")
+    sys.stderr.write("Invalid VSFS\n")
+    exit(1)
 
 # Define variables
 MIN_NUM_COMMAND = 3
@@ -67,3 +68,5 @@ elif (sys.argv[1] == "rmdir" and len(sys.argv) == 4):
         invalid_VSFS()
 else:
     invalid_VSFS()
+
+exit(0)
