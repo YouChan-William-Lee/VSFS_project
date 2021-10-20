@@ -15,12 +15,14 @@ def mkdir(FS, ID):
         file.write("\n")
 
     # Check subdirectories already exist
+    # Ex) ID is dir1/dir2/dir3, then index of '/' is 4 and 9
     index = [m.start() for m in re.finditer(r"/", ID)]
     for i in range(len(index)):
+        # Check all sub directories such as dir1 and dir1/dir2 whether they already exist
         if (lines.count("=" + ID[0:index[i]] + "/\n") == 0):
+            # If the sub directory doesn't exist, then create it 
             file.write("=" + ID[0:index[i]] + "/\n")
     
-    # Make ID
+    # Make ID such as dir1/dir2/dir3
     file.write("=" + ID + "/\n")
-
     file.close()

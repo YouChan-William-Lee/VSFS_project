@@ -26,7 +26,7 @@ def copyin(FS, EF, IF):
     if (len(EF_lines) > 255):
         EF_lines = EF_lines[0:255]
     
-    # Copy the content of EF into the IF
+    # Copy the content of EF into the IF with empty space at the start
     for line in EF_lines:
         IF_file.write(" " + line)    
     

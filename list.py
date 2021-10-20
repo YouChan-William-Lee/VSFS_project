@@ -1,10 +1,11 @@
 import os
 
 # List the contents of FS in 'ls -lR' format 
-def list(FS, dir):
+def list(FS, dir, is_last_dir):
     file_info = "file_info"
     command = "ls -l " + FS + " > " + file_info
     os.system(command)
+    # Save the information of FS
     ls_command_result = open(file_info, 'r').read().split()
     os.remove(file_info)
 
@@ -21,10 +22,11 @@ def list(FS, dir):
     file = open(FS, 'r')
     lines = file.readlines()
     if (dir == "current"):
-        print(".:")
-        print("total", total_size)
+        # Print total size
+        print(".:\ntotal", total_size)
         for index, line in enumerate(lines):
             # Check files
+            # Ex) a file on current directory is @note1
             if (line[0] == "@" and line.count("/") == 0):
                 # Check the size how many lines in the file
                 file_size = 0
@@ -35,31 +37,39 @@ def list(FS, dir):
                         file_index += 1
                     else:
                         break
+                # Print file information    
                 print("-" + attribute, "%3s"%1, owner, group, file_size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
             # Check directories
+            # Ex) a directory on current directory is =dir1/
             elif (line[0] == "=" and line.count("/") == 1 and line.find("/") + 1 == line.find("\n")):
+                # Print directory information
                 print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:-2])
     else:
-        print("./" + dir + ":")
-        print("total", total_size)
+        print("./" + dir + ":\ntotal", total_size)
         for index, line in enumerate(lines):
             # Check files
+            # Ex) a file on a sub directory is @dir1/note when dir is dir1
             if (line[0] == "@" and line.count("/") == dir.count("/") + 1 and line.find(dir) == 1):
                 # Check the size how many lines in the file
                 file_size = 0
                 file_index = index
                 while(True):
-                    if (lines[file_index + 1][0].isspace()):
+                    if (file_index < len(lines) - 1 and lines[file_index + 1][0].isspace()):
                         file_size += 1
                         file_index += 1
                     else:
                         break
+                # Print file information  
                 print("-" + attribute, "%3s"%1, owner, group, file_size, month, day, time, os.getcwd() + "/" + line[1:], end = '')
             # Check directories
-            elif (line[0] == "=" and line.count("/") == dir.count("/") + 2 and line.find(dir) == 1 and line.rfind("/") + 1 == line.rfind("\n")):
+            # Ex) a directory on a sub directory is =dir1/dir2/ when dir is dir1
+            elif (line[0] == "=" and line.count("/") == dir.count("/") + 2 and line.find(dir) == 1):
+                # Print directory inforamtion
                 print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, os.getcwd() + "/" + line[1:-2])
-
-    print("")
+    
+    # If dir is last one, then don't print new line
+    if (is_last_dir is False):
+        print("")
     file.close()
 
 # Check the total size of current directory
@@ -98,8 +108,11 @@ def check_number_of_subdir(FS, dir):
     file = open(FS, 'r')
     lines = file.readlines()
     for line in lines:
+        # Check directories
         if (line[0] == "="):
-            if (line.count("/") == dir.count("/") + 2 and line.find(dir) == 1 and line.rindex("/") + 1 == line.rindex("\n")):
+            # 1 condition Ex) line is dir1/dir2/ and dir is dir1, then dir1 has dir2 as a sub directory 
+            # 2 condition Ex) line is dir1/dir2/ and dir is dir2, then it is not sub directory
+            if (line.count("/") == dir.count("/") + 2 and line.find(dir) == 1):
                 total_number_of_subdir += 1
 
     file.close()
@@ -111,10 +124,9 @@ def check_subdir(FS):
     file = open(FS, 'r')
     lines = file.readlines()
     for line in lines:
+        # Check directories
         if (line[0] == "="):
-            # Check number of directory on current directory
-            if (line.rindex("/") + 1 == line.rindex("\n")):
-                dirs.append(line[1:-2])
+            dirs.append(line[1:-2])
 
     file.close()
     return sorted(dirs)

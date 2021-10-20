@@ -16,68 +16,64 @@ from check_IF import *
 from check_EF import *
 from check_ID import *
 
-# Print 'Invalid VSFS'
-def invalid_VSFS():
-    sys.stderr.write("Invalid VSFS\n")
-    exit(1)
-
 # Define variables
 MIN_NUM_COMMAND = 3
 MAX_NUM_COMMAND = 5
+# Error codes
+EINVAL = 22 # Invalid argument
 
 # Start VSFS program here
-if (len(sys.argv) < MIN_NUM_COMMAND or len(sys.argv) > MAX_NUM_COMMAND):
-    invalid_VSFS()
-# VSFS list FS    
-elif (sys.argv[1] == "list" and len(sys.argv) == 3):
-    # Check if FS exists
-    if(check_FS(sys.argv[2])):
-        dirs = check_subdir(sys.argv[2])
-        for dir in dirs:
-            list(sys.argv[2], dir)
+# When the number of argument is valid 
+if (MIN_NUM_COMMAND <= len(sys.argv) and MAX_NUM_COMMAND >= len(sys.argv)):
+    # VSFS list FS    
+    if (sys.argv[1] == "list" and len(sys.argv) == 3):
+        # Check if FS exists
+        if(check_FS(sys.argv[2])):
+            dirs = check_subdir(sys.argv[2])
+            # Print a list of each directory one by one
+            for dir in dirs:
+                list(sys.argv[2], dir, dir == dirs[-1])     
+    # VSFS copyin FS EF IF        
+    elif (sys.argv[1] == "copyin" and len(sys.argv) == 5):
+        if (check_FS(sys.argv[2]) and check_EF(sys.argv[1], sys.argv[3]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[4])):
+            copyin(sys.argv[2], sys.argv[3], sys.argv[4]) 
+    # VSFS copyout FS IF EF
+    elif (sys.argv[1] == "copyout" and len(sys.argv) == 5):
+        if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3]) and check_EF(sys.argv[1], sys.argv[4])):
+            copyout(sys.argv[2], sys.argv[3], sys.argv[4])
+    # VSFS mkdir FS ID   
+    elif (sys.argv[1] == "mkdir" and len(sys.argv) == 4):
+        if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
+            mkdir(sys.argv[2], sys.argv[3])
+    # VSFS rm FS IF        
+    elif (sys.argv[1] == "rm" and len(sys.argv) == 4):
+        if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3])):
+            rm(sys.argv[2], sys.argv[3])
+    # VSFS rmdir FS ID   
+    elif (sys.argv[1] == "rmdir" and len(sys.argv) == 4):
+        if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
+            rmdir(sys.argv[2], sys.argv[3])
+    # VSFS defrag FS        
+    elif (sys.argv[1] == "defrag" and len(sys.argv) == 3):
+        if(check_FS(sys.argv[2])):
+            defrag(sys.argv[2])
+    # VSFS index FS        
+    elif (sys.argv[1] == "index" and len(sys.argv) == 3):
+        if(check_FS(sys.argv[2])):
+            print("Not required\n")
     else:
-        invalid_VSFS()
-# VSFS copyin FS EF IF        
-elif (sys.argv[1] == "copyin" and len(sys.argv) == 5):
-    if (check_FS(sys.argv[2]) and check_EF(sys.argv[1], sys.argv[3]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[4])):
-        copyin(sys.argv[2], sys.argv[3], sys.argv[4]) 
-    else:
-        invalid_VSFS()
-# VSFS copyout FS IF EF
-elif (sys.argv[1] == "copyout" and len(sys.argv) == 5):
-    if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3]) and check_EF(sys.argv[1], sys.argv[4])):
-        copyout(sys.argv[2], sys.argv[3], sys.argv[4])
-    else:
-        invalid_VSFS()
-# VSFS mkdir FS ID   
-elif (sys.argv[1] == "mkdir" and len(sys.argv) == 4):
-    if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
-        mkdir(sys.argv[2], sys.argv[3])
-    else:
-        invalid_VSFS()
-# VSFS rm FS IF        
-elif (sys.argv[1] == "rm" and len(sys.argv) == 4):
-    if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3])):
-        rm(sys.argv[2], sys.argv[3])
-    else:
-        invalid_VSFS()
-# VSFS rmdir FS ID   
-elif (sys.argv[1] == "rmdir" and len(sys.argv) == 4):
-    if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
-        rmdir(sys.argv[2], sys.argv[3])
-    else:
-        invalid_VSFS()
-elif (sys.argv[1] == "defrag" and len(sys.argv) == 3):
-    if(check_FS(sys.argv[2])):
-        defrag(sys.argv[2])
-    else: 
-        invalid_VSFS()
-elif (sys.argv[1] == "index" and len(sys.argv) == 3):
-    if(check_FS(sys.argv[2])):
-        print("Not required\n")
-    else: 
-        invalid_VSFS()
+        error = "Invalid VSFS - VSFS: invalid option -- '" + ' '.join(str(list) for list in sys.argv[1:]) + "'\nPlease check 'man' page for more information.\n"
+        sys.stderr.write(error)
+        exit(EINVAL)
+# when argument is only ./VSFS        
+elif (len(sys.argv) == 1):
+    error = "Invalid VSFS - VSFS: require a valid option\nPlease check 'man' page for more information.\n" 
+    sys.stderr.write(error)
+    exit(EINVAL)
+# When argument is too short or too long    
 else:
-    invalid_VSFS()
+    error = "Invalid VSFS - VSFS: invalid option -- '" + ' '.join(str(list) for list in sys.argv[1:]) + "'\nPlease check 'man' page for more information.\n"
+    sys.stderr.write(error)
+    exit(EINVAL)
 
 exit(0)

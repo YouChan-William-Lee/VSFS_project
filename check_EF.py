@@ -14,7 +14,8 @@ def check_EF(COMMAND, EF):
             file.close()
         # Catch err
         except IOError as err:
-            sys.stderr.write(str(err) + "\n")
+            error = "Invalid VSFS - " + str(err)[10:] + "\n"
+            sys.stderr.write(error)
             exit(err.errno)
     # If commnad is 'copyout'
     elif (COMMAND == "copyout"):
@@ -24,7 +25,8 @@ def check_EF(COMMAND, EF):
             valid = os.path.isfile(EF)
         # Catch err
         except IOError as err:
-            sys.stderr.write(str(err) + "\n")
+            error = "Invalid VSFS - " + str(err)[11:] + "\n"
+            sys.stderr.write(error)
             exit(err.errno)
 
     return valid
