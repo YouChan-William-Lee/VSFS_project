@@ -60,7 +60,7 @@ if (MIN_NUM_COMMAND <= len(sys.argv) and MAX_NUM_COMMAND >= len(sys.argv)):
     # VSFS index FS        
     elif (sys.argv[1] == "index" and len(sys.argv) == 3):
         if(check_FS(sys.argv[2])):
-            print("Not required\n")
+            print("Not required")
     else:
         error = "Invalid VSFS - VSFS: invalid option -- '" + ' '.join(str(list) for list in sys.argv[1:]) + "'\nPlease check 'man' page for more information.\n"
         sys.stderr.write(error)
