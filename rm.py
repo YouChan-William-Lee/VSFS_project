@@ -31,4 +31,5 @@ def rm(FS, IF):
     file.seek(0)
     # Overwrite with newlines
     file.write(newlines)
+    
     file.close()

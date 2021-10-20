@@ -9,6 +9,7 @@ from list import *
 from mkdir import *
 from rm import *
 from rmdir import *
+from defrag import *
 
 from check_FS import *
 from check_IF import *
@@ -65,6 +66,16 @@ elif (sys.argv[1] == "rmdir" and len(sys.argv) == 4):
     if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
         rmdir(sys.argv[2], sys.argv[3])
     else:
+        invalid_VSFS()
+elif (sys.argv[1] == "defrag" and len(sys.argv) == 3):
+    if(check_FS(sys.argv[2])):
+        defrag(sys.argv[2])
+    else: 
+        invalid_VSFS()
+elif (sys.argv[1] == "index" and len(sys.argv) == 3):
+    if(check_FS(sys.argv[2])):
+        print("Not required\n")
+    else: 
         invalid_VSFS()
 else:
     invalid_VSFS()
