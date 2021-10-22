@@ -103,8 +103,8 @@ def check_IF(COMMAND, FS, IF):
         if (COMMAND == "copyin"):
             valid = True
             # IF already exists, then remove the original file
-            if (lines.count("@" + IF + "\n") == 1):
-                rm(FS, IF)
+            # if (lines.count("@" + IF + "\n") == 1):
+            #     # rm(FS, IF)
         elif (COMMAND == "copyout" or COMMAND == "rm"):
             # IF should exist 
             if (lines.count("@" + IF + "\n") == 1):
@@ -248,7 +248,16 @@ def copyin(FS, EF, IF):
 
     # Copy the content of EF into the IF with empty space at the start
     for line in newlines:
-        IF_file.write(" " + line)    
+        IF_file.write(" " + line)
+
+    IF_file.close()
+
+    # Check if there already exists IF
+    IF_file = open(FS, 'r')
+    IF_lines = IF_file.readlines()
+    # IF already exists, then remove the original file
+    if (IF_lines.count("@" + IF + "\n") == 2):
+        rm(FS, IF)    
     
     IF_file.close()
 
@@ -307,10 +316,12 @@ def rm(FS, IF):
     newlines = ""
     # To check how many lines need to be deleted
     count = 0
+    # Delete first one in case replace IF
+    found = False
 
     for index, line in enumerate(lines):
         # Check where IF is and put them in newlines to overwrite
-        if (line[1:-1] == IF and count == 0):
+        if (line[1:-1] == IF and count == 0 and not found):
             # write the line needs to be deleted into newlines
             newlines += "#" + line[1:]
             file_index = index
@@ -322,6 +333,7 @@ def rm(FS, IF):
                     file_index += 1
                     count += 1
                 else:
+                    found = True
                     break
         # If count is not 0, then it means the lines are added into newlines, so don't add them again
         elif (count == 0):
