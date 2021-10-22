@@ -25,7 +25,7 @@ def check_EF(EF):
         file.close()
     # Catch err
     except IOError as err:
-        error = "Invalid VSFS - " + str(err)[10:] + "\n"
+        error = "Invalid VSFS - EF " + str(err)[10:] + "\n"
         sys.stderr.write(error)
         exit(err.errno)
 
@@ -235,7 +235,6 @@ def copyin(FS, EF, IF):
     EF_file.close()
 
     IF_file = open(FS, 'a+')
-
     IF_lines = IF_file.readlines()
     # Check subdirectories already exist
     index = [m.start() for m in re.finditer(r"/", IF)]
