@@ -156,8 +156,6 @@ def list(FS, dir, is_last_dir):
     file = open(FS, 'r')
     lines = file.readlines()
     if (dir == "current"):
-        # Print total size
-        print(".:\ntotal", total_size)
         for index, line in enumerate(lines):
             # Check files
             # Ex) a file on current directory is @note1
@@ -179,7 +177,6 @@ def list(FS, dir, is_last_dir):
                 # Print directory information
                 print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, line[1:-2])
     else:
-        print("./" + dir + ":\ntotal", total_size)
         for index, line in enumerate(lines):
             # Check files
             # Ex) a file on a sub directory is @dir1/note when dir is dir1
@@ -201,9 +198,6 @@ def list(FS, dir, is_last_dir):
                 # Print directory inforamtion
                 print("d" + attribute, "%3s"%check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, line[1:-2])
     
-    # If dir is last one, then don't print new line
-    if (is_last_dir is False):
-        print("")
     file.close()
 
 # Check the total size of current directory
