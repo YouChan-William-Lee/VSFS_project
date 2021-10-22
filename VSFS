@@ -243,7 +243,7 @@ def copyin(FS, IF, EF):
     # Move cursor to the start to check last location of cursor is starting at the end of new line
     IF_file.seek(0)
     IF_lines = IF_file.readlines()
-    if(IF_lines[-1][-1].isspace() is False):
+    if((IF_lines[-1][-1] == "\n") is False):
         IF_file.write("\n")
         
     # Check subdirectories already exist
@@ -259,7 +259,7 @@ def copyin(FS, IF, EF):
     for line in newlines:
         IF_file.write(" " + line)
 
-    IF_file.close()
+    # IF_file.close()
 
 # Copy the internal file IF within FS to external file EF
 def copyout(FS, IF, EF):
@@ -323,7 +323,7 @@ def rm(FS, IF):
 
     for index, line in enumerate(lines):
         # Check where IF is and put them in newlines to overwrite
-        if (line[1:-1] == IF and count == 0 and not found):
+        if (line[0] == "@" and line[1:-1] == IF and count == 0 and not found):
             # write the line needs to be deleted into newlines
             newlines += "#" + line[1:]
             file_index = index
