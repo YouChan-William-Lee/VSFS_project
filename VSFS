@@ -74,7 +74,8 @@ def check_ID(COMMAND, FS, ID):
                 sys.stderr.write(error)
                 exit(EEXIST)
             else:
-                sys.stderr.write(str(lines.count("=" + ID + "/\n")))
+                error = "'" + ID + "'" + str(lines.count("=" + ID + "/\n"))
+                sys.stderr.write(error)
                 exit(EEXIST)
                 valid = True
         elif (COMMAND == "rmdir"):
