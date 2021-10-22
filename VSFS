@@ -197,6 +197,10 @@ def check_number_of_subdir(FS, dir):
             if (line.count("/") == dir.count("/") + 2 and line.find(dir) == 1):
                 total_number_of_subdir += 1
 
+    # Make empty directory visible in mc
+    if(total_number_of_subdir == 0):
+        total_number_of_subdir = 1
+        
     file.close()
     return total_number_of_subdir
 
