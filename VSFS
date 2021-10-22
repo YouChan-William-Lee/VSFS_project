@@ -25,7 +25,7 @@ def check_EF(EF):
         file.close()
     # Catch err
     except IOError as err:
-        error = "Invalid VSFS - " + str(err)[10:] + "\n"
+        error = "Invalid VSFS EF - " + str(err)[10:] + "\n"
         sys.stderr.write(error)
         exit(err.errno)
 
@@ -70,20 +70,17 @@ def check_ID(COMMAND, FS, ID):
         if (COMMAND == "mkdir"):
             # ID should not exist
             if (lines.count("=" + ID + "/\n") == 1):
-                error = "Invalid VSFS - mkdir: cannot create directory '" + ID + "': File exists\n"
+                error = "Invalid VSFS ID - mkdir: cannot create directory '" + ID + "': File exists\n"
                 sys.stderr.write(error)
                 exit(EEXIST)
             else:
-                error = "'" + ID + "'" + str(lines.count("=" + ID + "/\n"))
-                sys.stderr.write(error)
-                exit(EEXIST)
                 valid = True
         elif (COMMAND == "rmdir"):
             # ID should exist
             if (lines.count("=" + ID + "/\n") == 1):
                 valid = True
             else:
-                error = "Invalid VSFS - rmdir: failed to remove '" + ID + "': No such file or directory\n"
+                error = "Invalid VSFS ID - rmdir: failed to remove '" + ID + "': No such file or directory\n"
                 sys.stderr.write(error)
                 exit(ENOENT)
     else:
@@ -113,7 +110,7 @@ def check_IF(COMMAND, FS, IF):
             if (lines.count("@" + IF + "\n") == 1):
                 valid = True
             else:
-                error = "Invalid VSFS - No such file for directory: '" + IF + "'\n"
+                error = "Invalid VSFS IF - No such file for directory: '" + IF + "'\n"
                 sys.stderr.write(error)
                 exit(ENOENT)
     else:
