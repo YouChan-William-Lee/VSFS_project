@@ -79,7 +79,7 @@ def check_ID(COMMAND, FS, ID):
                 valid = True
         elif (COMMAND == "rmdir"):
             # ID should exist
-            if (lines.count("=" + ID + "/\n") == 1):
+            if (str(lines.count("=" + ID + "/\n") == 1)):
                 valid = True
             else:
                 error = "Invalid VSFS - rmdir: failed to remove '" + ID + "': No such file or directory\n"
