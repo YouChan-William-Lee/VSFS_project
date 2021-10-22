@@ -65,6 +65,10 @@ def check_ID(COMMAND, FS, ID):
     if(ID[-1] == "/"):
         ID = ID[0:-1]
 
+    error = "ERROR" + ID + "'\n"
+    sys.stderr.write(error)
+    exit(EINVAL)
+
     # Check if the first or last word of ID is '/'
     if (ID[0] != "/"):
         if (COMMAND == "mkdir"):
