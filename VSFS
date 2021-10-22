@@ -101,7 +101,7 @@ def check_IF(COMMAND, FS, IF):
     valid = False
 
     # Check if the first or last word of IF is '/'
-    if (IF[0] != "/" and IF[-1] != "/"):
+    if (IF[-1] != "/"):
         if (COMMAND == "copyin"):
             valid = True
             # IF already exists, then remove the original file
