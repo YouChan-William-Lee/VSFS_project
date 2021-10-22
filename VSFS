@@ -20,8 +20,6 @@ def check_EF(EF):
 
     try:
         # Check if EF is existent
-        if (not os.path.isfile(EF)):
-            file = open(EF, 'w')
         file = open(EF, 'r')
         valid = os.path.isfile(EF)
         file.close()
@@ -101,7 +99,7 @@ def check_IF(COMMAND, FS, IF):
     valid = False
 
     # Check if the first or last word of IF is '/'
-    if (IF[-1] != "/"):
+    if (IF[0] != "/" and IF[-1] != "/"):
         if (COMMAND == "copyin"):
             valid = True
             # IF already exists, then remove the original file
@@ -124,7 +122,7 @@ def check_IF(COMMAND, FS, IF):
     return valid
 
 # List the contents of FS in 'ls -lR' format 
-def list(FS, dir, is_last_dir):
+def list(FS, dir):
     file_info = "file_info"
     command = "ls -l " + FS + " > " + file_info
     os.system(command)
@@ -231,7 +229,6 @@ def copyin(FS, EF, IF):
         total_length += len(line)
         if (total_length > 255):
             newlines.append(line[total_length:255 - total_length])
-            break
         else:
             newlines.append(line)
     
@@ -430,7 +427,7 @@ if (MIN_NUM_COMMAND <= len(sys.argv) and MAX_NUM_COMMAND >= len(sys.argv)):
             dirs = check_subdir(sys.argv[2])
             # Print a list of each directory one by one
             for dir in dirs:
-                list(sys.argv[2], dir, dir == dirs[-1])     
+                list(sys.argv[2], dir)     
     # VSFS copyin FS EF IF        
     elif (sys.argv[1] == "copyin" and len(sys.argv) == 5):
         if (check_FS(sys.argv[2]) and check_EF(sys.argv[3]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[4])):
