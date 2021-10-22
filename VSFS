@@ -18,16 +18,21 @@ EINVAL = 22 # Invalid argument
 def check_EF(COMMAND, EF):
     valid = False
 
-    try:
-        # Check if EF is existent
-        file = open(EF, 'r')
-        valid = os.path.isfile(EF)
-        file.close()
-    # Catch err
-    except IOError as err:
-        error = "Invalid VSFS EF - " + COMMAND + str(err)[10:] + "\n"
-        sys.stderr.write(error)
-        exit(err.errno)
+    if (COMMAND == "copyin"):
+        try:
+            # Check if EF is existent
+            file = open(EF, 'r')
+            valid = os.path.isfile(EF)
+            file.close()
+            # Catch err
+        except IOError as err:
+            error = "Invalid VSFS - " + str(err)[10:] + "\n"
+            sys.stderr.write(error)
+            exit(err.errno)
+    elif (COMMAND == "copyout"):
+        # If EF already exists, then erase the content to replace in copyout with open(EF, 'w+')
+        # If EF doesn't exist, then create EF in copyout with open(EF, 'w+')
+        valid = True
 
     return valid
 
@@ -70,7 +75,7 @@ def check_ID(COMMAND, FS, ID):
         if (COMMAND == "mkdir"):
             # ID should not exist
             if (lines.count("=" + ID + "/\n") == 1):
-                error = "Invalid VSFS ID - mkdir: cannot create directory '" + ID + "': File exists\n"
+                error = "Invalid VSFS - mkdir: cannot create directory '" + ID + "': File exists\n"
                 sys.stderr.write(error)
                 exit(EEXIST)
             else:
@@ -80,7 +85,7 @@ def check_ID(COMMAND, FS, ID):
             if (lines.count("=" + ID + "/\n") == 1):
                 valid = True
             else:
-                error = "Invalid VSFS ID - rmdir: failed to remove '" + ID + "': No such file or directory\n"
+                error = "Invalid VSFS - rmdir: failed to remove '" + ID + "': No such file or directory\n"
                 sys.stderr.write(error)
                 exit(ENOENT)
     else:
@@ -103,14 +108,14 @@ def check_IF(COMMAND, FS, IF):
         if (COMMAND == "copyin"):
             valid = True
             # IF already exists, then remove the original file
-            # if (lines.count("@" + IF + "\n") == 1):
-            #     # rm(FS, IF)
+            if (lines.count("@" + IF + "\n") == 1):
+                rm(FS, IF)
         elif (COMMAND == "copyout" or COMMAND == "rm"):
             # IF should exist 
             if (lines.count("@" + IF + "\n") == 1):
                 valid = True
             else:
-                error = "Invalid VSFS IF - No such file for directory: '" + IF + "'\n"
+                error = "Invalid VSFS - No such file for directory: '" + IF + "'\n"
                 sys.stderr.write(error)
                 exit(ENOENT)
     else:
@@ -197,7 +202,7 @@ def check_number_of_subdir(FS, dir):
             if (line.count("/") == dir.count("/") + 2 and line.find(dir) == 1):
                 total_number_of_subdir += 1
 
-    # Make empty directory visible in mc
+    # Setting size as 1 can make empty directory visible in Midnight Commander
     if(total_number_of_subdir == 0):
         total_number_of_subdir = 1
         
@@ -218,7 +223,7 @@ def check_subdir(FS):
     return sorted(dirs)
 
 # Copy the external file, EF, into the FS as internal file named IF
-def copyin(FS, EF, IF):
+def copyin(FS, IF, EF):
     EF_file = open(EF, 'r')
     EF_lines = EF_file.readlines()
     newlines = []
@@ -251,20 +256,11 @@ def copyin(FS, EF, IF):
 
     IF_file.close()
 
-    # Check if there already exists IF
-    IF_file = open(FS, 'r')
-    IF_lines = IF_file.readlines()
-    # IF already exists, then remove the original file
-    if (IF_lines.count("@" + IF + "\n") == 2):
-        rm(FS, IF)    
-    
-    IF_file.close()
-
 # Copy the internal file IF within FS to external file EF
 def copyout(FS, IF, EF):
     
     IF_file = open(FS, 'r')
-    EF_file = open(EF, 'w')
+    EF_file = open(EF, 'w+')
     IF_lines = IF_file.readlines()
     
     for index, line in enumerate(IF_lines):
@@ -310,7 +306,8 @@ def rm(FS, IF):
     newlines = ""
     # To check how many lines need to be deleted
     count = 0
-    # Delete first one in case replace IF
+    # if IF replace the original one, there exist two same files
+    # Therefore, delete the first one and leave the second one
     found = False
 
     for index, line in enumerate(lines):
@@ -423,31 +420,41 @@ if (MIN_NUM_COMMAND <= len(sys.argv) and MAX_NUM_COMMAND >= len(sys.argv)):
             # Print a list of each directory one by one
             for dir in dirs:
                 list(sys.argv[2], dir)     
-    # VSFS copyin FS EF IF        
+    # I REALIZED THAT ORDER OF ARGUMENTS FOR copyin IS WRONG, IT SHOULD BE "VSFS copyin FS IF EF"            
+    # VSFS         copyin      FS          IF          EF  
+    # sys.argv[10] sys.argv[1] sys.argv[2] sys.argv[3] sys.argv[4]  
     elif (sys.argv[1] == "copyin" and len(sys.argv) == 5):
-        if (check_FS(sys.argv[2]) and check_EF(sys.argv[1], sys.argv[3]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[4])):
-            copyin(sys.argv[2], sys.argv[3], sys.argv[4]) 
-    # VSFS copyout FS IF EF
-    elif (sys.argv[1] == "copyout" and len(sys.argv) == 5):
         if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3]) and check_EF(sys.argv[1], sys.argv[4])):
-            copyout(sys.argv[2], sys.argv[3], sys.argv[4])
-    # VSFS mkdir FS ID   
+            copyin(sys.argv[2], sys.argv[3], sys.argv[4]) 
+    # VSFS         copyout     FS          IF          EF  
+    # sys.argv[10] sys.argv[1] sys.argv[2] sys.argv[3] sys.argv[4] 
+    elif (sys.argv[1] == "copyout" and len(sys.argv) == 5):
+        if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3]) and check_EF(sys.argv[1],sys.argv[4])):
+            copyout(sys.argv[2], sys.argv[3], sys.argv[4]) 
+    # VSFS         mkdir       FS          Id           
+    # sys.argv[10] sys.argv[1] sys.argv[2] sys.argv[3]
     elif (sys.argv[1] == "mkdir" and len(sys.argv) == 4):
         if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
             mkdir(sys.argv[2], sys.argv[3])
-    # VSFS rm FS IF        
+    # VSFS         rm          FS          IF           
+    # sys.argv[10] sys.argv[1] sys.argv[2] sys.argv[3]   
     elif (sys.argv[1] == "rm" and len(sys.argv) == 4):
         if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3])):
             rm(sys.argv[2], sys.argv[3])
     # VSFS rmdir FS ID   
+    # VSFS         rmdir       FS          ID         
+    # sys.argv[10] sys.argv[1] sys.argv[2] sys.argv[3] 
     elif (sys.argv[1] == "rmdir" and len(sys.argv) == 4):
         if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
             rmdir(sys.argv[2], sys.argv[3])
-    # VSFS defrag FS        
+    # VSFS defrag FS  
+    # VSFS         defrag      FS          
+    # sys.argv[10] sys.argv[1] sys.argv[2]      
     elif (sys.argv[1] == "defrag" and len(sys.argv) == 3):
         if(check_FS(sys.argv[2])):
             defrag(sys.argv[2])
-    # VSFS index FS        
+    # VSFS         index       FS      
+    # sys.argv[10] sys.argv[1] sys.argv[2]  
     elif (sys.argv[1] == "index" and len(sys.argv) == 3):
         if(check_FS(sys.argv[2])):
             print("Not required")
