@@ -15,32 +15,19 @@ EEXIST = 17 # File exists
 EINVAL = 22 # Invalid argument
 
 # Check external file EF
-def check_EF(COMMAND, EF):
+def check_EF(EF):
     valid = False
 
-    # If command is 'copyin'
-    if (COMMAND == "copyin"):
-        try:
-            # Check if EF is existent
-            file = open(EF, 'r')
-            valid = os.path.isfile(EF)
-            file.close()
-        # Catch err
-        except IOError as err:
-            error = "Invalid VSFS - " + str(err)[10:] + "\n"
-            sys.stderr.write(error)
-            exit(err.errno)
-    # If commnad is 'copyout'
-    elif (COMMAND == "copyout"):
-        try:
-            # Check if EF is existent
-            open(EF, 'x')
-            valid = os.path.isfile(EF)
-        # Catch err
-        except IOError as err:
-            error = "Invalid VSFS - " + str(err)[11:] + "\n"
-            sys.stderr.write(error)
-            exit(err.errno)
+    try:
+        # Check if EF is existent
+        file = open(EF, 'r')
+        valid = os.path.isfile(EF)
+        file.close()
+    # Catch err
+    except IOError as err:
+        error = "Invalid VSFS - " + str(err)[10:] + "\n"
+        sys.stderr.write(error)
+        exit(err.errno)
 
     return valid
 
@@ -426,11 +413,11 @@ if (MIN_NUM_COMMAND <= len(sys.argv) and MAX_NUM_COMMAND >= len(sys.argv)):
                 list(sys.argv[2], dir, dir == dirs[-1])     
     # VSFS copyin FS EF IF        
     elif (sys.argv[1] == "copyin" and len(sys.argv) == 5):
-        if (check_FS(sys.argv[2]) and check_EF(sys.argv[1], sys.argv[3]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[4])):
+        if (check_FS(sys.argv[2]) and check_EF(sys.argv[3]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[4])):
             copyin(sys.argv[2], sys.argv[3], sys.argv[4]) 
     # VSFS copyout FS IF EF
     elif (sys.argv[1] == "copyout" and len(sys.argv) == 5):
-        if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3]) and check_EF(sys.argv[1], sys.argv[4])):
+        if (check_FS(sys.argv[2]) and check_IF(sys.argv[1], sys.argv[2], sys.argv[3]) and check_EF(sys.argv[4])):
             copyout(sys.argv[2], sys.argv[3], sys.argv[4])
     # VSFS mkdir FS ID   
     elif (sys.argv[1] == "mkdir" and len(sys.argv) == 4):
