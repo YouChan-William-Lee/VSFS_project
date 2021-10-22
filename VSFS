@@ -49,7 +49,7 @@ def check_FS(FS):
         file.close()
     # Catch err
     except IOError as err:
-        error = "Invalid VSFS - " + str(err)[10:] + "\n"
+        error = "Invalid VSFS - FS " + str(err)[10:] + "\n"
         sys.stderr.write(error)
         exit(err.errno)
     
@@ -110,7 +110,7 @@ def check_IF(COMMAND, FS, IF):
             if (lines.count("@" + IF + "\n") == 1):
                 valid = True
             else:
-                error = "Invalid VSFS - No such file for directory: '" + IF + "'\n"
+                error = "Invalid VSFS IF - No such file for directory: '" + IF + "'\n"
                 sys.stderr.write(error)
                 exit(ENOENT)
     else:
