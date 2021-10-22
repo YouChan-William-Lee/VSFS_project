@@ -65,10 +65,6 @@ def check_ID(COMMAND, FS, ID):
     if(ID[-1] == "/"):
         ID = ID[0:-1]
 
-    error = "ERROR" + ID + "'\n"
-    sys.stderr.write(error)
-    exit(EINVAL)
-
     # Check if the first or last word of ID is '/'
     if (ID[0] != "/"):
         if (COMMAND == "mkdir"):
@@ -287,6 +283,9 @@ def copyout(FS, IF, EF):
 # Create empty internal directory ID in FS
 def mkdir(FS, ID):
     file = open(FS, 'a+')
+
+    sys.stderr.write(ID)
+    exit(1)
 
     # Check if the last word of ID is '/'
     if (ID[-1] == "/"):
