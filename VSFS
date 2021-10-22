@@ -69,6 +69,9 @@ def check_ID(COMMAND, FS, ID):
     if (ID[0] != "/"):
         if (COMMAND == "mkdir"):
             # ID should not exist
+            error = COMMAND + FS + ID
+            sys.stderr.write(error)
+            exit(1)
             if (lines.count("=" + ID + "/\n") == 1):
                 error = "Invalid VSFS - mkdir: cannot create directory '" + ID + "': File exists\n"
                 sys.stderr.write(error)
@@ -284,19 +287,11 @@ def copyout(FS, IF, EF):
 def mkdir(FS, ID):
     file = open(FS, 'a+')
 
-    sys.stderr.write(ID)
-    exit(1)
-
     # Check if the last word of ID is '/'
     if (ID[-1] == "/"):
         ID = ID[0:-1]
 
-    # Move cursor to the start to check last location of cursor is starting at the end of new line
-    file.seek(0)
     lines = file.readlines()
-    if (lines[-1][-1].isspace() is False):
-        file.write("\n")
-
     # Check subdirectories already exist
     # Ex) ID is dir1/dir2/dir3, then index of '/' is 4 and 9
     index = [m.start() for m in re.finditer(r"/", ID)]
