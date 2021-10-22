@@ -175,7 +175,7 @@ def list(FS, dir, is_last_dir):
             # Ex) a directory on current directory is =dir1/
             elif (line[0] == "=" and line.count("/") == 1 and line.find("/") + 1 == line.find("\n")):
                 # Print directory information
-                print("d" + attribute, check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, line[1:-2])
+                print("d" + attribute, check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, line[1:-1])
     else:
         for index, line in enumerate(lines):
             # Check files
@@ -196,7 +196,7 @@ def list(FS, dir, is_last_dir):
             # Ex) a directory on a sub directory is =dir1/dir2/ when dir is dir1
             elif (line[0] == "=" and line.count("/") == dir.count("/") + 2 and line.find(dir) == 1):
                 # Print directory inforamtion
-                print("d" + attribute, check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, line[1:-2])
+                print("d" + attribute, check_number_of_subdir(FS, line[1:-2]), owner, group, 0, month, day, time, line[1:-1])
     
     file.close()
 
