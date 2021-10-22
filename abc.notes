@@ -1,0 +1,31 @@
+NOTES V1.0
+@note1
+ This is the first note. Notice the leading space.
+ Another line
+ Another line
+ Another line
+ Another line
+ Another line
+ Another line
+@note2
+ The next note is empty.
+@emptynote
+=dir1/
+=dir2/
+=dir1/subdir1/
+=dir1/subdir2/
+@dir1/note1
+ Line
+=dir2/subdir1/
+@dir2/subdir1/note1
+ Line 1
+ Line 2
+@dir1/subdir2/note1
+ Although this is also note1, it is not in the root dir as the first was.
+ Dir1 above is an empty dir
+=dir1/dir3/
+@dir1/dir3/dir5
+ addContent
+=dir1/dir3/dir5/
+=dir1/dir3/dir5/dir10/
+=dir1/dir3/dir5/dir10/dir1/

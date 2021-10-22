@@ -240,7 +240,12 @@ def copyin(FS, IF, EF):
     EF_file.close()
 
     IF_file = open(FS, 'a+')
+    # Move cursor to the start to check last location of cursor is starting at the end of new line
+    IF_file.seek(0)
     IF_lines = IF_file.readlines()
+    if(IF_lines[-1][-1].isspace() is False):
+        IF_file.write("\n")
+        
     # Check subdirectories already exist
     index = [m.start() for m in re.finditer(r"/", IF)]
     for i in range(len(index)):
@@ -283,6 +288,12 @@ def mkdir(FS, ID):
     # Check if the last word of ID is '/'
     if (ID[-1] == "/"):
         ID = ID[0:-1]
+
+    # Move cursor to the start to check last location of cursor is starting at the end of new line
+    file.seek(0)
+    lines = file.readlines()
+    if(lines[-1][-1].isspace() is False):
+        lines.write("\n")
 
     lines = file.readlines()
     # Check subdirectories already exist
