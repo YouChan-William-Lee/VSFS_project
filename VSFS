@@ -288,7 +288,7 @@ def mkdir(FS, ID):
     # Check if the last word of ID is '/'
     if (ID[-1] == "/"):
         ID = ID[0:-1]
-
+    sys.stderr.write("test2")
     # Move cursor to the start to check last location of cursor is starting at the end of new line
     file.seek(0)
     lines = file.readlines()
@@ -298,13 +298,14 @@ def mkdir(FS, ID):
     lines = file.readlines()
     # Check subdirectories already exist
     # Ex) ID is dir1/dir2/dir3, then index of '/' is 4 and 9
+    sys.stderr.write("test3")
     index = [m.start() for m in re.finditer(r"/", ID)]
     for i in range(len(index)):
         # Check all sub directories such as dir1 and dir1/dir2 whether they already exist
         if (lines.count("=" + ID[0:index[i]] + "/\n") == 0):
             # If the sub directory doesn't exist, then create it 
             file.write("=" + ID[0:index[i]] + "/\n")
-    
+    sys.stderr.write("test4")
     # Make ID such as dir1/dir2/dir3
     file.write("=" + ID + "/\n")
     file.close()
@@ -446,6 +447,7 @@ if (MIN_NUM_COMMAND <= len(sys.argv) and MAX_NUM_COMMAND >= len(sys.argv)):
     # sys.argv[10] sys.argv[1] sys.argv[2] sys.argv[3]
     elif (sys.argv[1] == "mkdir" and len(sys.argv) == 4):
         if (check_FS(sys.argv[2]) and check_ID(sys.argv[1], sys.argv[2], sys.argv[3])):
+            sys.stderr.write("test1")
             mkdir(sys.argv[2], sys.argv[3])
     # VSFS         rm          FS          IF           
     # sys.argv[10] sys.argv[1] sys.argv[2] sys.argv[3]   
